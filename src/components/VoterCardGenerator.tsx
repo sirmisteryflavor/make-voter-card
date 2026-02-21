@@ -42,7 +42,7 @@ export default function VoterCardGenerator() {
    * Separated so it can be called from both manual generation and auto-update
    */
   const performGenerate = useCallback(async () => {
-    if (isLoading || !canvasRef.current) return;
+    if (!canvasRef.current) return;
 
     try {
       setIsLoading(true);
@@ -73,7 +73,7 @@ export default function VoterCardGenerator() {
     } finally {
       setIsLoading(false);
     }
-  }, [data, isLoading]);
+  }, [data]);
 
   /**
    * Debounced live preview on every keystroke/change
