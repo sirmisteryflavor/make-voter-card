@@ -35,10 +35,8 @@ function loadImageWithFallback(
 ): Promise<boolean> {
   return new Promise((resolve) => {
     let loaded = false;
-    let timedOut = false;
 
     const timeoutId = setTimeout(() => {
-      timedOut = true;
       if (!loaded) {
         resolve(false);
       }
