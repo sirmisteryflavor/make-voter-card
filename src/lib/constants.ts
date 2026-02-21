@@ -14,11 +14,10 @@ export const CANVAS_HEIGHT = 1920;
  * Add or remove images here; no need to update count elsewhere.
  */
 export const POTATO_IMAGES = [
-  "/images/potatoes/p1.png",
-  "/images/potatoes/p2.png",
-  "/images/potatoes/p3.png",
-  "/images/potatoes/p4.png",
-  "/images/potatoes/p5.png",
+  "/images/potatoes/potato-1.png",
+  "/images/potatoes/potato-2.png",
+  "/images/potatoes/potato-3.png",
+  "/images/potatoes/potato-4.png",
 ] as const;
 
 export const APP_NAME = "PotatoVotes";
