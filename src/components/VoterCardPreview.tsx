@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Download, Share2 } from "lucide-react";
+import { Download } from "lucide-react";
 import { VoterCardData } from "@/lib/types";
 import ShareButton from "./ShareButton";
 
