@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import VoterCardForm from "./VoterCardForm";
 import VoterCardPreview from "./VoterCardPreview";
 import { VoterCardData } from "@/lib/types";
