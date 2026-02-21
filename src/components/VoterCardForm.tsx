@@ -225,15 +225,19 @@ export default function VoterCardForm({
       <button
         onClick={onManualGenerate}
         disabled={isLoading}
-        className="lg:hidden sticky bottom-4 left-0 right-0 mx-4 z-40 bg-yellow-400 hover:bg-yellow-500 disabled:bg-yellow-300 disabled:cursor-not-allowed text-yellow-950 font-black py-4 rounded-2xl shadow-2xl transition-all active:scale-[0.98] disabled:active:scale-100 flex items-center justify-center gap-2"
+        className="lg:hidden sticky bottom-4 left-4 right-4 z-40 bg-yellow-400 hover:bg-yellow-500 disabled:bg-yellow-300 disabled:cursor-not-allowed text-yellow-950 font-black py-4 px-6 rounded-2xl shadow-2xl transition-all active:scale-[0.98] disabled:active:scale-100 flex items-center justify-center gap-2 whitespace-nowrap overflow-hidden"
       >
         {isLoading ? (
           <>
             <span className="inline-block animate-spin">⏳</span>
-            GENERATING...
+            <span className="hidden sm:inline">GENERATING...</span>
+            <span className="sm:hidden">GEN...</span>
           </>
         ) : (
-          "GENERATE"
+          <>
+            <span className="hidden sm:inline">GENERATE</span>
+            <span className="sm:hidden">GEN</span>
+          </>
         )}
       </button>
 
@@ -241,7 +245,7 @@ export default function VoterCardForm({
       <button
         onClick={onManualGenerate}
         disabled={isLoading}
-        className="hidden lg:flex w-full bg-yellow-400 hover:bg-yellow-500 disabled:bg-yellow-300 disabled:cursor-not-allowed text-yellow-950 font-black py-5 rounded-2xl shadow-lg shadow-yellow-100 transition-all active:scale-[0.98] disabled:active:scale-100 items-center justify-center gap-2"
+        className="hidden lg:flex w-full bg-yellow-400 hover:bg-yellow-500 disabled:bg-yellow-300 disabled:cursor-not-allowed text-yellow-950 font-black py-5 px-6 rounded-2xl shadow-lg shadow-yellow-100 transition-all active:scale-[0.98] disabled:active:scale-100 items-center justify-center gap-2"
       >
         {isLoading ? (
           <>

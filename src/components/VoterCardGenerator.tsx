@@ -75,17 +75,6 @@ export default function VoterCardGenerator() {
     }
   }, [data]);
 
-  /**
-   * Debounced live preview on every keystroke/change
-   * Updates canvas in real-time with 300ms debounce
-   */
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      performGenerate();
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [data, performGenerate]);
 
   /**
    * Manual generate button handler (for redundancy)
