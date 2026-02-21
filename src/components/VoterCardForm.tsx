@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Plus, X, RefreshCw } from "lucide-react";
+import React, { useRef } from "react";
+import { Plus, X, RefreshCw, Loader2 } from "lucide-react";
 import { VoterCardData, VotingRow } from "@/lib/types";
 import {
   POTATO_IMAGES,
@@ -26,6 +26,10 @@ export default function VoterCardForm({
   isLoading,
   error,
 }: Props) {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const rowInputRefs = useRef<{ [key: string]: { position: HTMLInputElement | null; decision: HTMLInputElement | null } }>({});
+
   const addRow = () => {
     if (data.rows.length >= MAX_TOTAL_ROWS) return;
     const newRow: VotingRow = {
@@ -55,8 +59,26 @@ export default function VoterCardForm({
     setData({ ...data, potatoIndex: newIndex });
   };
 
+  const handleMaxLength = (inputRef: React.RefObject<HTMLInputElement>, maxLen: number) => {
+    if (inputRef.current && inputRef.current.value.length >= maxLen) {
+      inputRef.current.classList.add('ring-2', 'ring-red-300');
+      setTimeout(() => {
+        inputRef.current?.classList.remove('ring-2', 'ring-red-300');
+      }, 600);
+    }
+  };
+
+  const handleRowMaxLength = (ref: HTMLInputElement | null, maxLen: number) => {
+    if (ref && ref.value.length >= maxLen) {
+      ref.classList.add('ring-2', 'ring-red-300');
+      setTimeout(() => {
+        ref.classList.remove('ring-2', 'ring-red-300');
+      }, 600);
+    }
+  };
+
   return (
-    <section className="space-y-8 pb-24 lg:pb-0" aria-labelledby="form-title">
+    <section className="flex-1 space-y-6" aria-labelledby="form-title">
       <h2 id="form-title" className="sr-only">
         Voter Card Information Form
       </h2>
@@ -64,7 +86,7 @@ export default function VoterCardForm({
       {/* Error Banner */}
       {error && (
         <div
-          className="bg-red-50 border-l-4 border-red-500 p-4 rounded sticky top-4 z-30"
+          className="bg-red-50 border-l-4 border-red-500 p-4 rounded sticky top-20 z-30"
           role="alert"
         >
           <p className="text-red-700 font-medium text-sm">{error}</p>
@@ -74,131 +96,128 @@ export default function VoterCardForm({
         </div>
       )}
 
-      {/* Header Inputs */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
-        <div className="relative">
-          <label
-            htmlFor="user-name"
-            className="block text-xs font-bold text-slate-400 uppercase mb-1"
-          >
-            Your Name
-          </label>
-          <input
-            id="user-name"
-            maxLength={MAX_NAME_CHARS}
-            className="w-full p-3 border-b-2 border-slate-100 focus:border-yellow-500 outline-none text-xl font-semibold transition-colors disabled:opacity-50"
-            placeholder="e.g. Spuddy McSpudface"
-            value={data.name}
-            onChange={(e) => setData({ ...data, name: e.target.value })}
-            disabled={isLoading}
-          />
-          <span className="absolute right-0 bottom-[-20px] text-[10px] text-slate-400">
-            {data.name.length}/{MAX_NAME_CHARS}
-          </span>
-        </div>
+      {/* Your Info */}
+      <div className="bg-white p-6 rounded-xl border border-zinc-200 space-y-5">
+        <h3 className="text-xs uppercase tracking-wide font-medium text-zinc-500">
+          Your Info
+        </h3>
 
-        <div className="relative pt-2">
-          <label
-            htmlFor="election-title"
-            className="block text-xs font-bold text-slate-400 uppercase mb-1"
-          >
-            Election Title
-          </label>
-          <input
-            id="election-title"
-            maxLength={MAX_TITLE_CHARS}
-            className="w-full p-3 border-b-2 border-slate-100 focus:border-yellow-500 outline-none transition-colors disabled:opacity-50"
-            placeholder="e.g. 2024 Presidential Election"
-            value={data.electionTitle}
-            onChange={(e) => setData({ ...data, electionTitle: e.target.value })}
-            disabled={isLoading}
-          />
-          <span className="absolute right-0 bottom-[-20px] text-[10px] text-slate-400">
-            {data.electionTitle.length}/{MAX_TITLE_CHARS}
-          </span>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="user-name" className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1.5 block">
+              Name
+            </label>
+            <input
+              ref={nameInputRef}
+              id="user-name"
+              maxLength={MAX_NAME_CHARS}
+              className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-3 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none text-base transition-colors placeholder:text-zinc-400"
+              placeholder="Your name"
+              value={data.name}
+              onChange={(e) => {
+                setData({ ...data, name: e.target.value });
+                handleMaxLength(nameInputRef, MAX_NAME_CHARS);
+              }}
+              disabled={isLoading}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="election-title" className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1.5 block">
+              Election Title
+            </label>
+            <input
+              ref={titleInputRef}
+              id="election-title"
+              maxLength={MAX_TITLE_CHARS}
+              className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-3 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none text-base transition-colors placeholder:text-zinc-400"
+              placeholder="e.g. 2026 New York Primary"
+              value={data.electionTitle}
+              onChange={(e) => {
+                setData({ ...data, electionTitle: e.target.value });
+                handleMaxLength(titleInputRef, MAX_TITLE_CHARS);
+              }}
+              disabled={isLoading}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Voting Rows */}
-      <div className="space-y-3">
-        <div className="flex justify-between items-center px-2">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">
-            Your Ballot Picks
+      {/* Voting Decisions */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-xs uppercase tracking-wide font-medium text-zinc-500">
+            Voting Decisions
           </h3>
-          <button
-            type="button"
-            onClick={randomizePotato}
-            className="text-xs flex items-center gap-1 text-slate-500 hover:text-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Change random potato image"
-            disabled={isLoading}
-          >
-            <RefreshCw size={12} /> Swap Potato
-          </button>
         </div>
 
-        <div className="space-y-4">
-          {data.rows.map((row, index) => (
+        <div className="space-y-3">
+          {data.rows.map((row) => (
             <div
               key={row.id}
-              className="group relative bg-white p-4 rounded-xl border border-slate-200 shadow-sm transition-shadow hover:shadow-md"
+              className="bg-white rounded-xl border border-zinc-200 p-4 relative"
             >
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 space-y-1">
-                  <label
-                    htmlFor={`pos-${row.id}`}
-                    className="sr-only"
-                  >
-                    Position or Office for row {index + 1}
+              {data.rows.length > 1 && (
+                <button
+                  onClick={() => removeRow(row.id)}
+                  disabled={isLoading}
+                  className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full text-zinc-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label={`Remove row`}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+
+              <div className="flex flex-col gap-3 pr-8">
+                <div>
+                  <label className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                    Position
                   </label>
                   <input
-                    id={`pos-${row.id}`}
+                    ref={(el) => {
+                      if (!rowInputRefs.current[row.id]) {
+                        rowInputRefs.current[row.id] = { position: null, decision: null };
+                      }
+                      if (el) rowInputRefs.current[row.id].position = el;
+                    }}
                     maxLength={MAX_ROW_TEXT_CHARS}
-                    className="w-full bg-transparent border-b border-transparent focus:border-slate-200 outline-none text-sm transition-colors disabled:opacity-50"
-                    placeholder="Position/Office"
+                    placeholder="e.g. Mayor"
                     value={row.position}
-                    onChange={(e) =>
-                      updateRow(row.id, "position", e.target.value)
-                    }
+                    onChange={(e) => {
+                      updateRow(row.id, "position", e.target.value);
+                      if (rowInputRefs.current[row.id]?.position) {
+                        handleRowMaxLength(rowInputRefs.current[row.id].position, MAX_ROW_TEXT_CHARS);
+                      }
+                    }}
                     disabled={isLoading}
+                    className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors placeholder:text-zinc-400"
                   />
-                  <div className="text-[9px] text-slate-300 text-right">
-                    {row.position.length}/{MAX_ROW_TEXT_CHARS}
-                  </div>
                 </div>
 
-                <div className="flex-1 space-y-1">
-                  <label
-                    htmlFor={`dec-${row.id}`}
-                    className="sr-only"
-                  >
-                    Your pick for row {index + 1}
+                <div>
+                  <label className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                    Candidate
                   </label>
                   <input
-                    id={`dec-${row.id}`}
+                    ref={(el) => {
+                      if (!rowInputRefs.current[row.id]) {
+                        rowInputRefs.current[row.id] = { position: null, decision: null };
+                      }
+                      if (el) rowInputRefs.current[row.id].decision = el;
+                    }}
                     maxLength={MAX_ROW_TEXT_CHARS}
-                    className="w-full bg-transparent border-b border-transparent focus:border-slate-200 outline-none text-sm font-bold transition-colors disabled:opacity-50"
-                    placeholder="Your Choice"
+                    placeholder="e.g. Jane Smith"
                     value={row.decision}
-                    onChange={(e) =>
-                      updateRow(row.id, "decision", e.target.value)
-                    }
+                    onChange={(e) => {
+                      updateRow(row.id, "decision", e.target.value);
+                      if (rowInputRefs.current[row.id]?.decision) {
+                        handleRowMaxLength(rowInputRefs.current[row.id].decision, MAX_ROW_TEXT_CHARS);
+                      }
+                    }}
                     disabled={isLoading}
+                    className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors placeholder:text-zinc-400"
                   />
-                  <div className="text-[9px] text-slate-300 text-right">
-                    {row.decision.length}/{MAX_ROW_TEXT_CHARS}
-                  </div>
                 </div>
-
-                {data.rows.length > 1 && (
-                  <button
-                    onClick={() => removeRow(row.id)}
-                    className="self-center p-2 text-slate-300 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-label={`Remove row ${index + 1}`}
-                    disabled={isLoading}
-                  >
-                    <X size={18} />
-                  </button>
-                )}
               </div>
             </div>
           ))}
@@ -207,55 +226,49 @@ export default function VoterCardForm({
         {data.rows.length < MAX_TOTAL_ROWS ? (
           <button
             onClick={addRow}
-            className="w-full py-4 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 hover:border-slate-300 hover:text-slate-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
-            aria-label={`Add a new candidate or measure. Current count: ${data.rows.length} of ${MAX_TOTAL_ROWS}`}
+            className="w-full py-3 border border-dashed border-zinc-300 rounded-xl text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            <Plus size={18} /> Add Candidate or Measure ({data.rows.length}/
-            {MAX_TOTAL_ROWS})
+            <Plus className="h-4 w-4" /> Add Row
           </button>
         ) : (
-          <p className="text-center text-xs text-amber-600 font-medium py-2">
+          <p className="text-center text-xs text-zinc-500 py-3">
             Max limit of {MAX_TOTAL_ROWS} rows reached.
           </p>
         )}
       </div>
 
-      {/* Mobile sticky button */}
-      <button
-        onClick={onManualGenerate}
-        disabled={isLoading}
-        className="lg:hidden sticky bottom-4 left-4 right-4 z-40 bg-yellow-400 hover:bg-yellow-500 disabled:bg-yellow-300 disabled:cursor-not-allowed text-yellow-950 font-black py-4 px-6 rounded-2xl shadow-2xl transition-all active:scale-[0.98] disabled:active:scale-100 flex items-center justify-center gap-2 whitespace-nowrap overflow-hidden"
-      >
-        {isLoading ? (
-          <>
-            <span className="inline-block animate-spin">⏳</span>
-            <span className="hidden sm:inline">GENERATING...</span>
-            <span className="sm:hidden">GEN...</span>
-          </>
-        ) : (
-          <>
-            <span className="hidden sm:inline">GENERATE</span>
-            <span className="sm:hidden">GEN</span>
-          </>
-        )}
-      </button>
+      {/* Actions */}
+      <div className="fixed bottom-4 left-4 right-4 z-40 sm:relative sm:bottom-auto sm:left-auto sm:right-auto sm:z-auto">
+        <button
+          onClick={onManualGenerate}
+          disabled={isLoading}
+          className="w-full bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Generating...</span>
+            </>
+          ) : (
+            "Generate Card"
+          )}
+        </button>
+      </div>
 
-      {/* Desktop button - only visible on lg+ */}
-      <button
-        onClick={onManualGenerate}
-        disabled={isLoading}
-        className="hidden lg:flex w-full bg-yellow-400 hover:bg-yellow-500 disabled:bg-yellow-300 disabled:cursor-not-allowed text-yellow-950 font-black py-5 px-6 rounded-2xl shadow-lg shadow-yellow-100 transition-all active:scale-[0.98] disabled:active:scale-100 items-center justify-center gap-2"
-      >
-        {isLoading ? (
-          <>
-            <span className="inline-block animate-spin">⏳</span>
-            GENERATING...
-          </>
-        ) : (
-          "GENERATE MY VOTER CARD"
-        )}
-      </button>
+      {/* Swap Potato Button */}
+      <div className="flex justify-center pb-4 sm:pb-0">
+        <button
+          onClick={randomizePotato}
+          disabled={isLoading}
+          className="bg-zinc-100 hover:bg-zinc-200 text-zinc-600 text-xs font-medium px-3 py-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Change random potato image"
+          title="Swap Potato"
+        >
+          <RefreshCw className="h-3.5 w-3.5 inline mr-1" />
+          Swap Potato
+        </button>
+      </div>
     </section>
   );
 }

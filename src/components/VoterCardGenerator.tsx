@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import VoterCardForm from "./VoterCardForm";
 import VoterCardPreview from "./VoterCardPreview";
 import { VoterCardData } from "@/lib/types";
@@ -64,6 +64,7 @@ export default function VoterCardGenerator() {
         });
       }
     } catch (err) {
+      // Handle errors gracefully
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -75,7 +76,6 @@ export default function VoterCardGenerator() {
     }
   }, [data]);
 
-
   /**
    * Manual generate button handler (for redundancy)
    */
@@ -85,7 +85,7 @@ export default function VoterCardGenerator() {
   };
 
   return (
-    <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start">
+    <div className="flex flex-col lg:flex-row gap-8">
       <VoterCardForm
         data={data}
         setData={setData}
@@ -93,7 +93,7 @@ export default function VoterCardGenerator() {
         isLoading={isLoading}
         error={error}
       />
-      <div ref={previewSectionRef} className="scroll-mt-4">
+      <div ref={previewSectionRef} className="lg:w-[360px] shrink-0">
         <VoterCardPreview
           canvasRef={canvasRef}
           isGenerated={isGenerated}
