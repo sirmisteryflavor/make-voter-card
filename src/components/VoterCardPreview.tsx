@@ -47,29 +47,7 @@ export default function VoterCardPreview({
         </span>
       </div>
 
-      {/* Empty State */}
-      {!isGenerated && !isLoading && (
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
-          <p className="text-slate-400 text-sm">
-            Fill out the form to see your voter card preview here. Updates live as you type.
-          </p>
-        </div>
-      )}
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
-          <div className="flex flex-col items-center gap-4">
-            <div className="animate-spin text-4xl">⏳</div>
-            <p className="text-slate-500 font-medium">Generating your card...</p>
-            <p className="text-slate-400 text-sm">
-              This should only take a moment
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Error State */}
+      {/* Error State - Always Visible */}
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
           <p className="text-red-700 font-medium text-sm">Error</p>
@@ -77,20 +55,25 @@ export default function VoterCardPreview({
         </div>
       )}
 
-      {/* Canvas Preview */}
-      {isGenerated && (
-        <div className="space-y-4" aria-live="polite" aria-label="Voter card generated and ready to share">
-          <div className="bg-slate-100 p-4 rounded-2xl shadow-lg overflow-hidden">
-            <canvas
-              ref={canvasRef}
-              className="w-full h-auto bg-white rounded"
-              role="img"
-              aria-label="Generated voter card preview showing your selected candidates and ballot positions"
-            />
-          </div>
+      {/* Canvas Container - ALWAYS in DOM */}
+      <div
+        className={`relative ${isGenerated ? "" : "hidden"}`}
+        aria-live="polite"
+        aria-label="Voter card preview"
+      >
+        {/* Canvas - Always rendered so ref always works */}
+        <div className="bg-slate-100 p-4 rounded-2xl shadow-lg overflow-hidden">
+          <canvas
+            ref={canvasRef}
+            className="w-full h-auto bg-white rounded"
+            role="img"
+            aria-label="Generated voter card preview showing your selected candidates and ballot positions"
+          />
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3">
+        {/* Action Buttons - Only show after generation */}
+        {isGenerated && (
+          <div className="flex gap-3 mt-4">
             <button
               onClick={handleDownload}
               className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
@@ -103,6 +86,28 @@ export default function VoterCardPreview({
               canvasRef={canvasRef}
               cardData={data}
             />
+          </div>
+        )}
+      </div>
+
+      {/* Empty State - Overlay shown before generation */}
+      {!isGenerated && !isLoading && !error && (
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
+          <p className="text-slate-400 text-sm">
+            Fill out the form to see your voter card preview here. Updates live as you type.
+          </p>
+        </div>
+      )}
+
+      {/* Loading State - Overlay shown while generating */}
+      {isLoading && (
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin text-4xl">⏳</div>
+            <p className="text-slate-500 font-medium">Generating your card...</p>
+            <p className="text-slate-400 text-sm">
+              This should only take a moment
+            </p>
           </div>
         </div>
       )}
