@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import VoterCardForm from "./VoterCardForm";
 import VoterCardPreview from "./VoterCardPreview";
 import { VoterCardData } from "@/lib/types";
@@ -86,12 +86,21 @@ export default function VoterCardGenerator() {
     await performGenerate();
   };
 
+  const prevPotatoIndexRef = useRef(data.potatoIndex);
+
+  useEffect(() => {
+    if (isGenerated && prevPotatoIndexRef.current !== data.potatoIndex) {
+      performGenerate();
+      prevPotatoIndexRef.current = data.potatoIndex;
+    }
+  }, [data.potatoIndex, isGenerated, performGenerate]);
+
   /**
    * Randomize potato image
    */
   const randomizePotato = () => {
     const newIndex = Math.floor(Math.random() * POTATO_IMAGES.length) + 1;
-    setData({ ...data, potatoIndex: newIndex });
+    setData((prev) => ({ ...prev, potatoIndex: newIndex }));
   };
 
   return (

@@ -41,10 +41,6 @@ function loadImageWithFallback(
   });
 }
 
-/**
- * Wraps text to fit within a maximum width, returning an array of lines.
- * Uses ctx.measureText() to determine where to break.
- */
 function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -97,21 +93,41 @@ export async function drawCard(
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
-    // 2. Layout Constants — Tighter Margins
-    const cardMargin = 36;
+    // 2. Layout Constants
+    const cardMargin = 40;
     const contentPadding = 48;
     const leftX = cardMargin + contentPadding;
     const rightX = CANVAS_WIDTH - cardMargin - contentPadding;
     const contentWidth = rightX - leftX;
-    const cardTop = 80;
-    const cardHeight = 1700;
 
-    // 3. White Card Background
-    ctx.fillStyle = "#FFFFFF";
+    // Massive Border
+    const borderWidth = 24;
+
+    // 3. The Avant-Garde Potato Base (Off-White with Massive Deep Brown Border)
+    ctx.fillStyle = "#45220A"; // potato-dark Outer border color
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // 4. Load Potato Asset as Watermark
+    ctx.fillStyle = "#FDFCF0"; // potato-light inner background
+    // Fill the inner canvas, leaving the border
+    ctx.fillRect(borderWidth, borderWidth, CANVAS_WIDTH - borderWidth * 2, CANVAS_HEIGHT - borderWidth * 2);
+
+    // 3.5. Draw the Tactile Starchy Dot Grid
+    ctx.fillStyle = "#A68A5B"; // Subtle mustard accent
+    ctx.globalAlpha = 0.3;
+    const dotSpacing = 40;
+    const dotRadius = 3;
+    for (let x = borderWidth + dotSpacing / 2; x < CANVAS_WIDTH - borderWidth; x += dotSpacing) {
+      for (let y = borderWidth + dotSpacing / 2; y < CANVAS_HEIGHT - borderWidth; y += dotSpacing) {
+        ctx.beginPath();
+        ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1.0;
+
+    // 4. Draw the Subtle Potato Background Watermark
     const potatoImg = new Image();
+    potatoImg.crossOrigin = "anonymous";
     const arrayIndex = Math.max(
       0,
       Math.min(data.potatoIndex - 1, POTATO_IMAGES.length - 1)
@@ -120,124 +136,163 @@ export async function drawCard(
 
     const imageLoaded = await loadImageWithFallback(potatoImg);
 
-    // 5. Draw Potato Watermark (semi-transparent, centered in card)
     if (imageLoaded) {
-      const potatoSize = 450;
-      const potatoX = leftX + contentWidth / 2 - potatoSize / 2;
-      const potatoY = cardTop + cardHeight / 2 - potatoSize / 2;
+      // Massive, subtle background potato
+      const potatoSize = 1200;
+      const potatoX = (CANVAS_WIDTH - potatoSize) / 2;
+      const potatoY = (CANVAS_HEIGHT - potatoSize) / 2 + 100; // slightly lower than center
 
+      ctx.save();
+      // Subtle transparency
       ctx.globalAlpha = 0.05;
+
       ctx.drawImage(potatoImg, potatoX, potatoY, potatoSize, potatoSize);
-      ctx.globalAlpha = 1.0;
+      ctx.restore();
     }
 
-    // 6. "MY VOTER CARD" Label
-    let currentY = 140;
-    ctx.fillStyle = "#A1A1AA";
-    ctx.font = "600 32px sans-serif";
-    ctx.textAlign = "left";
-    ctx.textBaseline = "top";
-    ctx.fillText("MY VOTER CARD", leftX, currentY);
-    currentY += 50;
+    // 5. Header Area
+    let currentY = borderWidth + 60;
 
-    // 7. Election Title (with wrapping)
-    ctx.fillStyle = "#18181B";
-    ctx.font = "bold 64px sans-serif";
+    // Small "MY VOTER CARD" label WITH Brutalist Box
+    const labelText = data.name ? `${data.name.toUpperCase()}'S VOTER CARD` : "MY VOTER CARD";
+    ctx.font = "800 32px sans-serif";
+    const labelMetrics = ctx.measureText(labelText);
+    const labelHeight = 32;
+
+    ctx.fillStyle = "#FFFFFF"; // Hyper Violet background
+    ctx.fillRect(leftX - 8, currentY - 8, labelMetrics.width + 16, labelHeight + 16);
+
+    // Brutalist hard shadow for label box
+    ctx.fillStyle = "#45220A"; // potato-dark drop shadow
+    ctx.fillRect(leftX - 8 + 4, currentY - 8 + 4, labelMetrics.width + 16, labelHeight + 16);
+
+    // Redraw the box over the shadow
+    ctx.fillStyle = "#45220A"; // Hyper Violet background
+    ctx.fillRect(leftX - 8, currentY - 8, labelMetrics.width + 16, labelHeight + 16);
+
+    ctx.fillStyle = "#FDFCF0"; // White text
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    const titleLines = wrapText(ctx, data.electionTitle || "2024 Voter Guide", contentWidth);
+    ctx.fillText(labelText, leftX, currentY);
+
+    currentY += 60;
+
+    // Large Election Title WITH Sprout Highlight Box background
+    ctx.font = "900 76px sans-serif";
+    const title = data.electionTitle || "2024 Voter Guide";
+    const titleLines = wrapText(ctx, title, contentWidth);
+    const lineHeight = 86;
+
     for (const line of titleLines) {
-      ctx.fillText(line, leftX, currentY);
-      currentY += 76;
-    }
-    currentY += 20;
+      const lineMetrics = ctx.measureText(line);
 
-    // 8. Divider line (thin, zinc-200)
-    ctx.strokeStyle = "#E4E4E7";
-    ctx.lineWidth = 1;
+      // Sprout shadow
+      ctx.fillStyle = "#45220A";
+      ctx.fillRect(leftX - 12 + 6, currentY - 8 + 6, lineMetrics.width + 24, 76 + 16);
+
+      // Sprout box
+      ctx.fillStyle = "#ADFF00"; // Electric Sprout
+      ctx.fillRect(leftX - 12, currentY - 8, lineMetrics.width + 24, 76 + 16);
+
+      // Black text
+      ctx.fillStyle = "#45220A"; // potato-dark
+      ctx.fillText(line, leftX, currentY);
+      currentY += lineHeight;
+    }
+
+    currentY += 24;
+
+    // Thick Divider line under title
+    ctx.strokeStyle = "#45220A";
+    ctx.lineWidth = 10;
     ctx.beginPath();
     ctx.moveTo(leftX, currentY);
     ctx.lineTo(rightX, currentY);
     ctx.stroke();
-    currentY += 40;
 
-    // 9. Get filled rows separated by type
+    currentY += 60;
+
+    // 5. Sections
     const filledRows = data.rows.filter(
       (r) => r.position.trim() && r.decision.trim()
     );
     const candidates = filledRows.filter((r) => r.type === "candidate");
     const measures = filledRows.filter((r) => r.type === "measure");
 
-    // Helper function to render a section of rows
     const renderSection = (sectionLabel: string, rows: typeof filledRows) => {
       if (rows.length === 0) return;
 
-      // Section Header
-      ctx.fillStyle = "#A1A1AA";
-      ctx.font = "600 32px sans-serif";
+      // Section Header ("CANDIDATES" / "PROPOSITIONS")
+      ctx.fillStyle = "#8B7355"; // muted brown
+      ctx.font = "800 32px sans-serif";
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
       ctx.fillText(sectionLabel, leftX, currentY);
-      currentY += 45;
+      currentY += 56;
 
-      // Render rows in this section
-      for (const row of rows) {
-        // Position text (left-aligned)
-        ctx.fillStyle = "#71717A";
-        ctx.font = "400 40px sans-serif";
+      // Render rows
+      for (let j = 0; j < rows.length; j++) {
+        const row = rows[j];
+
+        // Position (Top line)
+        ctx.fillStyle = "#8B4513"; // Custom Potato label color
+        ctx.font = "700 36px sans-serif";
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
-        ctx.fillText(row.position, leftX, currentY);
+        ctx.fillText(row.position.toUpperCase(), leftX, currentY);
 
-        // Decision text (right-aligned)
-        ctx.fillStyle = "#18181B";
-        ctx.font = "600 40px sans-serif";
-        ctx.textAlign = "right";
+        currentY += 44;
+
+        // Candidate / Decision (Second line, left aligned, wrapping if needed)
+        ctx.fillStyle = "#45220A"; // potato-dark
+        ctx.font = "900 48px sans-serif";
+        ctx.textAlign = "left";
         ctx.textBaseline = "top";
-        ctx.fillText(row.decision, rightX, currentY);
 
-        currentY += 48;
+        const decisionLines = wrapText(ctx, row.decision.toUpperCase(), contentWidth);
+        for (const line of decisionLines) {
+          ctx.fillText(line, leftX, currentY);
+          currentY += 56;
+        }
 
-        // Divider line below row
-        ctx.strokeStyle = "#E4E4E7";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(leftX, currentY);
-        ctx.lineTo(rightX, currentY);
-        ctx.stroke();
+        currentY += 4;
 
-        currentY += 52;
+        // Note (Third line, left aligned, wrapping if needed)
+        if (row.note && row.note.trim()) {
+          ctx.fillStyle = "#A68A5B"; // muted accent
+          ctx.font = "italic 32px sans-serif";
+          ctx.textAlign = "left";
+
+          const noteLines = wrapText(ctx, row.note.trim(), contentWidth);
+          for (const line of noteLines) {
+            ctx.fillText(line, leftX, currentY);
+            currentY += 42;
+          }
+          currentY += 12;
+        }
+
+        // Subtle thin divider between rows (but not after the last row)
+        if (j < rows.length - 1) {
+          ctx.strokeStyle = "#E8D5B8"; // Custom Card Border
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(leftX, currentY);
+          ctx.lineTo(rightX, currentY);
+          ctx.stroke();
+          currentY += 24;
+        } else {
+          currentY += 16;
+        }
       }
     };
 
-    // 10. Render CANDIDATES section
     renderSection("CANDIDATES", candidates);
 
-    // 11. Add spacing between sections if both exist
     if (candidates.length > 0 && measures.length > 0) {
       currentY += 20;
     }
 
-    // 12. Render PROPOSITIONS section
-    renderSection("PROPOSITIONS", measures);
-
-    // 13. Footer Area (anchored to card bottom)
-    const cardBottom = cardTop + cardHeight;
-    const footerDividerY = cardBottom - 60;
-
-    // Divider line before footer
-    ctx.strokeStyle = "#E4E4E7";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(leftX, footerDividerY);
-    ctx.lineTo(rightX, footerDividerY);
-    ctx.stroke();
-
-    // 13. Branding Footer (below card)
-    ctx.fillStyle = "#D4D4D8";
-    ctx.font = "400 26px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("Made on www.potatovotes.com", CANVAS_WIDTH / 2, cardBottom + 50);
+    renderSection("MEASURES", measures);
   } catch (error) {
     // Re-throw with context for the component to handle
     if (error instanceof Error) {
