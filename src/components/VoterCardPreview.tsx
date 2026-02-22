@@ -2,7 +2,9 @@
 
 import React from "react";
 import { Download, RefreshCw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { VoterCardData } from "@/lib/types";
+import { Button } from "@/components/ui/Button";
 import ShareButton from "./ShareButton";
 
 interface Props {
@@ -22,15 +24,35 @@ export default function VoterCardPreview({
   error,
   randomizePotato,
 }: Props) {
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!canvasRef.current) return;
 
-    const link = document.createElement("a");
-    link.href = canvasRef.current.toDataURL("image/png");
-    link.download = `PotatoVotes-${data.name || "Ballot"}-${Date.now()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // Convert canvas to blob directly (PNG format for lossless quality)
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvasRef.current?.toBlob((b) => resolve(b), "image/png");
+      });
+
+      if (!blob) {
+        console.error("Failed to convert canvas to blob");
+        return;
+      }
+
+      const safeName = (data.name || "Ballot").replace(/[^a-zA-Z0-9]/g, "-");
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `PotatoVotes-${safeName}-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Cleanup memory
+      URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      console.error("Failed to download card", e);
+    }
   };
 
   return (
@@ -41,8 +63,8 @@ export default function VoterCardPreview({
 
       {/* Sticky Preview Container */}
       <div className="sticky top-24 lg:top-8">
-        <h3 className="text-xs uppercase tracking-wider text-[#8B7355] mb-3 text-center font-semibold">
-          Preview
+        <h3 className="text-sm uppercase tracking-widest text-zinc-900 mb-4 text-center font-black">
+          Live Preview
         </h3>
 
         {/* Canvas Container - ALWAYS in DOM */}
@@ -52,70 +74,81 @@ export default function VoterCardPreview({
           aria-label="Voter card preview"
         >
           {/* Canvas - Always rendered so ref always works */}
-          <div className="bg-[#F5EDE0] p-3 rounded-xl border border-[#E8D5B8] aspect-[9/16] flex items-center justify-center overflow-hidden shadow-sm">
+          <div className="bg-zinc-50 p-4 rounded-2xl border-4 border-zinc-900 shadow-brutal aspect-[9/16] flex items-center justify-center overflow-hidden">
             <canvas
               ref={canvasRef}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain rounded-lg border-2 border-zinc-900"
               role="img"
               aria-label="Generated voter card preview showing your selected candidates and ballot positions"
             />
           </div>
 
           {/* Action Buttons - Only show after generation */}
-          {isGenerated && (
-            <div className="flex flex-col gap-2 mt-3">
-              <button
-                onClick={randomizePotato}
-                disabled={isLoading}
-                className="w-full border-2 border-dashed border-zinc-300 bg-transparent hover:border-zinc-400 hover:bg-zinc-50 text-zinc-600 font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                aria-label="Change random potato image"
-                title="Swap Potato"
+          <AnimatePresence>
+            {isGenerated && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col gap-3 mt-5"
               >
-                <RefreshCw className="h-4 w-4" />
-                Swap Potato
-              </button>
-              <button
-                onClick={handleDownload}
-                className="w-full bg-[#3D2E16] hover:bg-[#2A1F10] text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
-                aria-label="Download voter card as PNG image"
-              >
-                <Download className="h-4 w-4" /> Download
-              </button>
-              <ShareButton
-                canvasRef={canvasRef}
-                cardData={data}
-              />
-            </div>
-          )}
+                <Button
+                  onClick={randomizePotato}
+                  disabled={isLoading}
+                  variant="outline"
+                  className="w-full border-dashed"
+                  aria-label="Change random potato image"
+                  title="Swap Potato"
+                >
+                  <RefreshCw className="h-5 w-5 mr-2 stroke-[3]" />
+                  SWAP POTATO
+                </Button>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    onClick={handleDownload}
+                    variant="primary"
+                    className="w-full text-sm"
+                    aria-label="Download voter card as PNG image"
+                  >
+                    <Download className="h-4 w-4 mr-2 stroke-[3]" /> DOWNLOAD
+                  </Button>
+                  <ShareButton
+                    canvasRef={canvasRef}
+                    cardData={data}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Empty State - Shown before generation */}
         {!isGenerated && !isLoading && !error && (
-          <div className="bg-[#FFFCF5] p-6 rounded-xl border border-[#E8D5B8] text-center aspect-[9/16] flex flex-col items-center justify-center shadow-sm">
-            <span className="text-4xl mb-3">🥔</span>
-            <p className="text-sm text-[#8B7355]">
-              Fill in the form and click<br />
-              Generate to preview
+          <div className="bg-zinc-50 p-6 rounded-2xl border-4 border-zinc-900 border-dashed text-center aspect-[9/16] flex flex-col items-center justify-center shadow-brutal">
+            <span className="text-6xl mb-4 grayscale opacity-50">🥔</span>
+            <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest leading-relaxed">
+              Fill in the form<br />
+              and generate<br />
+              to preview
             </p>
           </div>
         )}
 
         {/* Loading State - Shown while generating */}
         {isLoading && (
-          <div className="bg-[#FFFCF5] p-6 rounded-xl border border-[#E8D5B8] text-center aspect-[9/16] flex flex-col items-center justify-center shadow-sm">
-            <div className="animate-spin text-4xl mb-3">⏳</div>
-            <p className="text-sm text-[#8B7355] font-medium">
-              Generating your card...
+          <div className="bg-zinc-50 p-6 rounded-2xl border-4 border-zinc-900 text-center aspect-[9/16] flex flex-col items-center justify-center shadow-brutal">
+            <div className="animate-spin text-4xl mb-4">⏳</div>
+            <p className="text-sm font-black text-zinc-900 uppercase tracking-widest">
+              GENERATING ART...
             </p>
-            <p className="text-xs text-[#A68A5B] mt-1">
-              This should only take a moment
+            <p className="text-xs text-zinc-500 mt-2 font-bold tracking-wide">
+              Please wait
             </p>
           </div>
         )}
 
         {/* Size info */}
-        <p className="text-xs text-center text-[#8B7355] mt-2">
-          1080 × 1920px • 9:16 ratio
+        <p className="text-xs font-bold text-center text-zinc-500 mt-4 tracking-widest uppercase">
+          1080 × 1920PX • 9:16 RATIO
         </p>
       </div>
     </section>
