@@ -152,75 +152,112 @@ export default function VoterCardForm({
         </div>
 
         <div className="space-y-3">
-          {data.rows.map((row) => (
-            <div
-              key={row.id}
-              className="bg-white rounded-xl border border-zinc-200 p-4 relative"
-            >
-              {data.rows.length > 1 && (
-                <button
-                  onClick={() => removeRow(row.id)}
-                  disabled={isLoading}
-                  className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full text-zinc-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label={`Remove row`}
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+          {data.rows.map((row) => {
+            const isCandidate = row.type === "candidate";
+            const positionLabel = isCandidate ? "Position" : "Proposition";
+            const positionPlaceholder = isCandidate ? "e.g. Mayor, Governor, Senator" : "e.g. Prop 33 - Rent Control";
+            const decisionLabel = isCandidate ? "Candidate" : "Your Vote";
+            const decisionPlaceholder = isCandidate ? "e.g. Jane Smith" : "e.g. Yes, No, For, Against";
 
-              <div className="flex flex-col gap-3 pr-8">
-                <div>
-                  <label className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
-                    Position
-                  </label>
-                  <input
-                    ref={(el) => {
-                      if (!rowInputRefs.current[row.id]) {
-                        rowInputRefs.current[row.id] = { position: null, decision: null };
-                      }
-                      if (el) rowInputRefs.current[row.id].position = el;
-                    }}
-                    maxLength={MAX_ROW_TEXT_CHARS}
-                    placeholder="e.g. Mayor"
-                    value={row.position}
-                    onChange={(e) => {
-                      updateRow(row.id, "position", e.target.value);
-                      if (rowInputRefs.current[row.id]?.position) {
-                        handleRowMaxLength(rowInputRefs.current[row.id].position, MAX_ROW_TEXT_CHARS);
-                      }
-                    }}
-                    disabled={isLoading}
-                    className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors placeholder:text-zinc-400"
-                  />
+            return (
+              <div
+                key={row.id}
+                className="bg-white rounded-xl border border-zinc-200 p-4"
+              >
+                {/* Type Toggle and Delete Button */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="inline-flex bg-zinc-100 rounded-lg p-0.5">
+                    <button
+                      onClick={() => updateRow(row.id, "type", "candidate")}
+                      disabled={isLoading}
+                      className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                        isCandidate
+                          ? "text-violet-700 bg-white shadow-sm"
+                          : "text-zinc-500 hover:text-zinc-600"
+                      }`}
+                    >
+                      Candidate
+                    </button>
+                    <button
+                      onClick={() => updateRow(row.id, "type", "measure")}
+                      disabled={isLoading}
+                      className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                        !isCandidate
+                          ? "text-violet-700 bg-white shadow-sm"
+                          : "text-zinc-500 hover:text-zinc-600"
+                      }`}
+                    >
+                      Proposition
+                    </button>
+                  </div>
+
+                  {data.rows.length > 1 && (
+                    <button
+                      onClick={() => removeRow(row.id)}
+                      disabled={isLoading}
+                      className="w-7 h-7 flex items-center justify-center rounded-full text-zinc-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label={`Remove row`}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
 
-                <div>
-                  <label className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
-                    Candidate
-                  </label>
-                  <input
-                    ref={(el) => {
-                      if (!rowInputRefs.current[row.id]) {
-                        rowInputRefs.current[row.id] = { position: null, decision: null };
-                      }
-                      if (el) rowInputRefs.current[row.id].decision = el;
-                    }}
-                    maxLength={MAX_ROW_TEXT_CHARS}
-                    placeholder="e.g. Jane Smith"
-                    value={row.decision}
-                    onChange={(e) => {
-                      updateRow(row.id, "decision", e.target.value);
-                      if (rowInputRefs.current[row.id]?.decision) {
-                        handleRowMaxLength(rowInputRefs.current[row.id].decision, MAX_ROW_TEXT_CHARS);
-                      }
-                    }}
-                    disabled={isLoading}
-                    className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors placeholder:text-zinc-400"
-                  />
+                {/* Input Fields */}
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                      {positionLabel}
+                    </label>
+                    <input
+                      ref={(el) => {
+                        if (!rowInputRefs.current[row.id]) {
+                          rowInputRefs.current[row.id] = { position: null, decision: null };
+                        }
+                        if (el) rowInputRefs.current[row.id].position = el;
+                      }}
+                      maxLength={MAX_ROW_TEXT_CHARS}
+                      placeholder={positionPlaceholder}
+                      value={row.position}
+                      onChange={(e) => {
+                        updateRow(row.id, "position", e.target.value);
+                        if (rowInputRefs.current[row.id]?.position) {
+                          handleRowMaxLength(rowInputRefs.current[row.id].position, MAX_ROW_TEXT_CHARS);
+                        }
+                      }}
+                      disabled={isLoading}
+                      className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors placeholder:text-zinc-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                      {decisionLabel}
+                    </label>
+                    <input
+                      ref={(el) => {
+                        if (!rowInputRefs.current[row.id]) {
+                          rowInputRefs.current[row.id] = { position: null, decision: null };
+                        }
+                        if (el) rowInputRefs.current[row.id].decision = el;
+                      }}
+                      maxLength={MAX_ROW_TEXT_CHARS}
+                      placeholder={decisionPlaceholder}
+                      value={row.decision}
+                      onChange={(e) => {
+                        updateRow(row.id, "decision", e.target.value);
+                        if (rowInputRefs.current[row.id]?.decision) {
+                          handleRowMaxLength(rowInputRefs.current[row.id].decision, MAX_ROW_TEXT_CHARS);
+                        }
+                      }}
+                      disabled={isLoading}
+                      className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors placeholder:text-zinc-400"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {data.rows.length < MAX_TOTAL_ROWS ? (
