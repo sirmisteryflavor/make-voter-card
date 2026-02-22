@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Share2 } from "lucide-react";
 import { VoterCardData } from "@/lib/types";
+import { Button } from "@/components/ui/Button";
 
 interface Props {
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -29,7 +30,7 @@ export default function ShareButton({ canvasRef, cardData }: Props) {
     try {
       setIsSharing(true);
 
-      // Convert canvas to blob and then to File
+      // Convert canvas to blob directly using toBlob API
       const blob = await new Promise<Blob | null>((resolve) => {
         canvasRef.current?.toBlob((b) => resolve(b), "image/png");
       });
@@ -47,9 +48,8 @@ export default function ShareButton({ canvasRef, cardData }: Props) {
       // Use Web Share API
       await navigator.share({
         title: "My PotatoVotes Card",
-        text: `Check out my voter picks! ${
-          cardData.electionTitle || "2024 Voter Guide"
-        }`,
+        text: `Check out my voter picks! ${cardData.electionTitle || "2024 Voter Guide"
+          }`,
         files: [file],
       });
     } catch (err) {
@@ -63,14 +63,16 @@ export default function ShareButton({ canvasRef, cardData }: Props) {
   };
 
   return (
-    <button
+    <Button
       onClick={handleShare}
       disabled={isSharing}
-      className="w-full bg-[#A68A5B] hover:bg-[#C8973E] disabled:bg-[#8B7355] disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+      isLoading={isSharing}
+      variant="secondary"
+      className="w-full text-sm"
       aria-label="Share voter card on social media or messaging app"
     >
-      <Share2 size={16} />
-      {isSharing ? "Sharing..." : "Share"}
-    </button>
+      <Share2 className="h-4 w-4 mr-2 stroke-[3]" />
+      SHARE
+    </Button>
   );
 }
