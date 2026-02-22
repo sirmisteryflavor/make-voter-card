@@ -234,14 +234,19 @@ export async function drawCard(
       for (let j = 0; j < rows.length; j++) {
         const row = rows[j];
 
-        // Position (Top line)
+        // Position (Top line, wrapping if needed)
         ctx.fillStyle = "#8B4513"; // Custom Potato label color
         ctx.font = "700 36px sans-serif";
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
-        ctx.fillText(row.position.toUpperCase(), leftX, currentY);
 
-        currentY += 44;
+        const positionLines = wrapText(ctx, row.position.toUpperCase(), contentWidth);
+        for (const line of positionLines) {
+          ctx.fillText(line, leftX, currentY);
+          currentY += 44;
+        }
+
+        currentY += 4;
 
         // Candidate / Decision (Second line, left aligned, wrapping if needed)
         ctx.fillStyle = "#45220A"; // potato-dark

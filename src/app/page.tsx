@@ -38,6 +38,26 @@ export default function LandingPage() {
             <p className="text-lg md:text-xl text-potato-muted font-bold mt-4 max-w-xl mx-auto">
               The easiest way to share your voting decisions with your friends. Generate your ballot by filling the form below and click generate.
             </p>
+
+            {/* Example Card Presentation */}
+            <div className="mt-12 mb-4 relative group w-full max-w-sm mx-auto">
+              {/* Decorative shadow block */}
+              <div className="absolute inset-0 bg-hyper translate-x-3 translate-y-3 rounded-xl transition-transform duration-500" />
+
+              {/* Actual Image container */}
+              <div className="relative border-4 border-potato-dark rounded-xl overflow-hidden shadow-brutal bg-potato-light">
+                <img
+                  src="/images/example-card.png"
+                  alt="A completed example of a PotatoVotes ballot receipt"
+                  className="w-full h-auto object-cover border-none"
+                />
+              </div>
+
+              {/* Floating brutalist badge */}
+              <div className="absolute -bottom-4 -right-4 bg-sprout text-potato-dark font-black tracking-widest text-sm px-4 py-2 rounded-lg border-4 border-potato-dark shadow-brutal-sm transform rotate-6">
+                EXAMPLE
+              </div>
+            </div>
           </div>
 
           <VoterCardGenerator />
