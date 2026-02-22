@@ -161,62 +161,67 @@ export async function drawCard(
     ctx.stroke();
     currentY += 40;
 
-    // 9. Get filled rows and determine section label
+    // 9. Get filled rows separated by type
     const filledRows = data.rows.filter(
       (r) => r.position.trim() && r.decision.trim()
     );
     const candidates = filledRows.filter((r) => r.type === "candidate");
     const measures = filledRows.filter((r) => r.type === "measure");
 
-    let sectionLabel = "";
-    if (candidates.length > 0 && measures.length > 0) {
-      sectionLabel = "MY BALLOT";
-    } else if (candidates.length > 0) {
-      sectionLabel = "CANDIDATES";
-    } else if (measures.length > 0) {
-      sectionLabel = "PROPOSITIONS";
-    }
+    // Helper function to render a section of rows
+    const renderSection = (sectionLabel: string, rows: typeof filledRows) => {
+      if (rows.length === 0) return;
 
-    // 10. Section Header
-    if (sectionLabel) {
+      // Section Header
       ctx.fillStyle = "#A1A1AA";
       ctx.font = "600 32px sans-serif";
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
       ctx.fillText(sectionLabel, leftX, currentY);
       currentY += 45;
+
+      // Render rows in this section
+      for (const row of rows) {
+        // Position text (left-aligned)
+        ctx.fillStyle = "#71717A";
+        ctx.font = "400 40px sans-serif";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+        ctx.fillText(row.position, leftX, currentY);
+
+        // Decision text (right-aligned)
+        ctx.fillStyle = "#18181B";
+        ctx.font = "600 40px sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "top";
+        ctx.fillText(row.decision, rightX, currentY);
+
+        currentY += 48;
+
+        // Divider line below row
+        ctx.strokeStyle = "#E4E4E7";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(leftX, currentY);
+        ctx.lineTo(rightX, currentY);
+        ctx.stroke();
+
+        currentY += 52;
+      }
+    };
+
+    // 10. Render CANDIDATES section
+    renderSection("CANDIDATES", candidates);
+
+    // 11. Add spacing between sections if both exist
+    if (candidates.length > 0 && measures.length > 0) {
+      currentY += 20;
     }
 
-    // 11. Draw Voting Rows
-    for (const row of filledRows) {
-      // Position text (left-aligned)
-      ctx.fillStyle = "#71717A";
-      ctx.font = "400 40px sans-serif";
-      ctx.textAlign = "left";
-      ctx.textBaseline = "top";
-      ctx.fillText(row.position, leftX, currentY);
+    // 12. Render PROPOSITIONS section
+    renderSection("PROPOSITIONS", measures);
 
-      // Decision text (right-aligned)
-      ctx.fillStyle = "#18181B";
-      ctx.font = "600 40px sans-serif";
-      ctx.textAlign = "right";
-      ctx.textBaseline = "top";
-      ctx.fillText(row.decision, rightX, currentY);
-
-      currentY += 48;
-
-      // Divider line below row
-      ctx.strokeStyle = "#E4E4E7";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(leftX, currentY);
-      ctx.lineTo(rightX, currentY);
-      ctx.stroke();
-
-      currentY += 52;
-    }
-
-    // 12. Footer Area (anchored to card bottom)
+    // 13. Footer Area (anchored to card bottom)
     const cardBottom = cardTop + cardHeight;
     const footerDividerY = cardBottom - 60;
 
