@@ -66,10 +66,10 @@ export default function ShareButton({ canvasRef, cardData }: Props) {
     <button
       onClick={handleShare}
       disabled={isSharing}
-      className="flex-1 bg-yellow-400 hover:bg-yellow-500 disabled:bg-yellow-300 disabled:cursor-not-allowed text-yellow-950 font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+      className="w-full bg-[#A68A5B] hover:bg-[#C8973E] disabled:bg-[#8B7355] disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
       aria-label="Share voter card on social media or messaging app"
     >
-      <Share2 size={18} />
+      <Share2 size={16} />
       {isSharing ? "Sharing..." : "Share"}
     </button>
   );

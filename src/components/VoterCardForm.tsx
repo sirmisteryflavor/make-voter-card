@@ -8,6 +8,7 @@ import {
   MAX_NAME_CHARS,
   MAX_TITLE_CHARS,
   MAX_ROW_TEXT_CHARS,
+  MAX_NOTE_CHARS,
   MAX_TOTAL_ROWS,
 } from "@/lib/constants";
 
@@ -37,6 +38,7 @@ export default function VoterCardForm({
       type: "candidate",
       position: "",
       decision: "",
+      note: "",
     };
     setData({ ...data, rows: [...data.rows, newRow] });
   };
@@ -249,6 +251,24 @@ export default function VoterCardForm({
                         if (rowInputRefs.current[row.id]?.decision) {
                           handleRowMaxLength(rowInputRefs.current[row.id].decision, MAX_ROW_TEXT_CHARS);
                         }
+                      }}
+                      disabled={isLoading}
+                      className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors placeholder:text-zinc-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1 block">
+                      Note (optional)
+                    </label>
+                    <input
+                      maxLength={MAX_NOTE_CHARS}
+                      placeholder={isCandidate ? "e.g. Endorsed by NYT" : "e.g. Protects renters"}
+                      value={row.note}
+                      onChange={(e) => {
+                        updateRow(row.id, "note", e.target.value);
+                        const noteInput = (e.target as HTMLInputElement);
+                        handleRowMaxLength(noteInput, MAX_NOTE_CHARS);
                       }}
                       disabled={isLoading}
                       className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors placeholder:text-zinc-400"

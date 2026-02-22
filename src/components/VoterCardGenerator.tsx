@@ -16,7 +16,7 @@ export default function VoterCardGenerator() {
     name: "",
     electionTitle: "",
     potatoIndex: 1,
-    rows: [{ id: "1", type: "candidate", position: "", decision: "" }],
+    rows: [{ id: "1", type: "candidate", position: "", decision: "", note: "" }],
   });
 
   /**
@@ -33,6 +33,7 @@ export default function VoterCardGenerator() {
         ...row,
         position: row.position.trim(),
         decision: row.decision.trim(),
+        note: row.note.trim(),
       })),
     };
   };

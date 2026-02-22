@@ -10,6 +10,7 @@ export interface VotingRow {
   type: VotingRowType;
   position: string;
   decision: string;
+  note: string;
 }
 
 export interface VoterCardData {

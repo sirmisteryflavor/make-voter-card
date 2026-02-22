@@ -4,6 +4,7 @@
 export const MAX_NAME_CHARS = 50;
 export const MAX_TITLE_CHARS = 80;
 export const MAX_ROW_TEXT_CHARS = 60; // Max for both Position and Decision
+export const MAX_NOTE_CHARS = 40;
 export const MAX_TOTAL_ROWS = 10;
 
 export const CANVAS_WIDTH = 1080;

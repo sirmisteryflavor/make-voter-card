@@ -32,85 +32,80 @@ export default function VoterCardPreview({
   };
 
   return (
-    <section className="space-y-6 mt-8 lg:mt-0" aria-labelledby="preview-title">
+    <section className="space-y-4" aria-labelledby="preview-title">
       <h2 id="preview-title" className="sr-only">
         Voter Card Preview
       </h2>
 
-      {/* Live Preview Indicator */}
-      <div className="flex items-center justify-between px-2 lg:px-0">
-        <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">
-          Live Preview
+      {/* Sticky Preview Container */}
+      <div className="sticky top-24 lg:top-8">
+        <h3 className="text-xs uppercase tracking-wider text-[#8B7355] mb-3 text-center font-semibold">
+          Preview
         </h3>
-        <span className="text-xs text-slate-500">
-          Updates as you type
-        </span>
-      </div>
 
-      {/* Error State - Always Visible */}
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-          <p className="text-red-700 font-medium text-sm">Error</p>
-          <p className="text-red-600 text-xs mt-1">{error}</p>
-        </div>
-      )}
-
-      {/* Canvas Container - ALWAYS in DOM */}
-      <div
-        className={`relative ${isGenerated ? "" : "hidden"}`}
-        aria-live="polite"
-        aria-label="Voter card preview"
-      >
-        {/* Canvas - Always rendered so ref always works */}
-        <div className="bg-slate-100 p-4 rounded-2xl shadow-lg overflow-hidden">
-          <canvas
-            ref={canvasRef}
-            className="w-full h-auto bg-white rounded"
-            role="img"
-            aria-label="Generated voter card preview showing your selected candidates and ballot positions"
-          />
-        </div>
-
-        {/* Action Buttons - Only show after generation */}
-        {isGenerated && (
-          <div className="flex gap-3 mt-4">
-            <button
-              onClick={handleDownload}
-              className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
-              aria-label="Download voter card as PNG image"
-            >
-              <Download size={18} /> Download
-            </button>
-            {/* ShareButton only renders on mobile with Web Share API */}
-            <ShareButton
-              canvasRef={canvasRef}
-              cardData={data}
+        {/* Canvas Container - ALWAYS in DOM */}
+        <div
+          className={`relative ${isGenerated ? "" : "hidden"}`}
+          aria-live="polite"
+          aria-label="Voter card preview"
+        >
+          {/* Canvas - Always rendered so ref always works */}
+          <div className="bg-[#F5EDE0] p-3 rounded-xl border border-[#E8D5B8] aspect-[9/16] flex items-center justify-center overflow-hidden shadow-sm">
+            <canvas
+              ref={canvasRef}
+              className="w-full h-full object-contain"
+              role="img"
+              aria-label="Generated voter card preview showing your selected candidates and ballot positions"
             />
           </div>
-        )}
-      </div>
 
-      {/* Empty State - Overlay shown before generation */}
-      {!isGenerated && !isLoading && !error && (
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
-          <p className="text-slate-400 text-sm">
-            Fill out the form to see your voter card preview here. Updates live as you type.
-          </p>
+          {/* Action Buttons - Only show after generation */}
+          {isGenerated && (
+            <div className="flex flex-col gap-2 mt-3">
+              <button
+                onClick={handleDownload}
+                className="w-full bg-[#3D2E16] hover:bg-[#2A1F10] text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                aria-label="Download voter card as PNG image"
+              >
+                <Download className="h-4 w-4" /> Download
+              </button>
+              <ShareButton
+                canvasRef={canvasRef}
+                cardData={data}
+              />
+            </div>
+          )}
         </div>
-      )}
 
-      {/* Loading State - Overlay shown while generating */}
-      {isLoading && (
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
-          <div className="flex flex-col items-center gap-4">
-            <div className="animate-spin text-4xl">⏳</div>
-            <p className="text-slate-500 font-medium">Generating your card...</p>
-            <p className="text-slate-400 text-sm">
+        {/* Empty State - Shown before generation */}
+        {!isGenerated && !isLoading && !error && (
+          <div className="bg-[#FFFCF5] p-6 rounded-xl border border-[#E8D5B8] text-center aspect-[9/16] flex flex-col items-center justify-center shadow-sm">
+            <span className="text-4xl mb-3">🥔</span>
+            <p className="text-sm text-[#8B7355]">
+              Fill in the form and click<br />
+              Generate to preview
+            </p>
+          </div>
+        )}
+
+        {/* Loading State - Shown while generating */}
+        {isLoading && (
+          <div className="bg-[#FFFCF5] p-6 rounded-xl border border-[#E8D5B8] text-center aspect-[9/16] flex flex-col items-center justify-center shadow-sm">
+            <div className="animate-spin text-4xl mb-3">⏳</div>
+            <p className="text-sm text-[#8B7355] font-medium">
+              Generating your card...
+            </p>
+            <p className="text-xs text-[#A68A5B] mt-1">
               This should only take a moment
             </p>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Size info */}
+        <p className="text-xs text-center text-[#8B7355] mt-2">
+          1080 × 1920px • 9:16 ratio
+        </p>
+      </div>
     </section>
   );
 }

@@ -3,11 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --background: #F9F9F9;
+  --background: #FDF6EC;
+  --foreground: #3D2E16;
+  --card: #FFFCF5;
+  --card-border: #E8D5B8;
+  --muted: #8B7355;
+  --accent: #A68A5B;
+  --gold: #C8973E;
+}
+
+* {
+  @apply antialiased;
 }
 
 body {
   background: var(--background);
-  color: #1a1a1a;
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Source Sans Pro",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
 }
