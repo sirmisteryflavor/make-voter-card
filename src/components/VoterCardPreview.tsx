@@ -67,7 +67,7 @@ export default function VoterCardPreview({
               <button
                 onClick={randomizePotato}
                 disabled={isLoading}
-                className="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full border-2 border-dashed border-zinc-300 bg-transparent hover:border-zinc-400 hover:bg-zinc-50 text-zinc-600 font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 aria-label="Change random potato image"
                 title="Swap Potato"
               >
