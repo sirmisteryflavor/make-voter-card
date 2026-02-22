@@ -5,6 +5,7 @@ import VoterCardForm from "./VoterCardForm";
 import VoterCardPreview from "./VoterCardPreview";
 import { VoterCardData } from "@/lib/types";
 import { drawCard } from "@/lib/drawCard";
+import { POTATO_IMAGES } from "@/lib/constants";
 
 export default function VoterCardGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -85,6 +86,14 @@ export default function VoterCardGenerator() {
     await performGenerate();
   };
 
+  /**
+   * Randomize potato image
+   */
+  const randomizePotato = () => {
+    const newIndex = Math.floor(Math.random() * POTATO_IMAGES.length) + 1;
+    setData({ ...data, potatoIndex: newIndex });
+  };
+
   return (
     <div className="flex flex-col lg:flex-row gap-8">
       <VoterCardForm
@@ -101,6 +110,7 @@ export default function VoterCardGenerator() {
           data={data}
           isLoading={isLoading}
           error={error}
+          randomizePotato={randomizePotato}
         />
       </div>
     </div>

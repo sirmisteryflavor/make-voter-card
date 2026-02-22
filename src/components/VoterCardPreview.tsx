@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Download } from "lucide-react";
+import { Download, RefreshCw } from "lucide-react";
 import { VoterCardData } from "@/lib/types";
 import ShareButton from "./ShareButton";
 
@@ -11,6 +11,7 @@ interface Props {
   data: VoterCardData;
   isLoading: boolean;
   error: string | null;
+  randomizePotato: () => void;
 }
 
 export default function VoterCardPreview({
@@ -19,6 +20,7 @@ export default function VoterCardPreview({
   data,
   isLoading,
   error,
+  randomizePotato,
 }: Props) {
   const handleDownload = () => {
     if (!canvasRef.current) return;
@@ -62,6 +64,16 @@ export default function VoterCardPreview({
           {/* Action Buttons - Only show after generation */}
           {isGenerated && (
             <div className="flex flex-col gap-2 mt-3">
+              <button
+                onClick={randomizePotato}
+                disabled={isLoading}
+                className="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                aria-label="Change random potato image"
+                title="Swap Potato"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Swap Potato
+              </button>
               <button
                 onClick={handleDownload}
                 className="w-full bg-[#3D2E16] hover:bg-[#2A1F10] text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"

@@ -233,16 +233,6 @@ export async function drawCard(
     ctx.lineTo(rightX, footerDividerY);
     ctx.stroke();
 
-    // "Prepared by" text
-    ctx.fillStyle = "#A1A1AA";
-    ctx.font = "400 28px sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
-    const preparedText = data.name
-      ? `Prepared by ${data.name}`
-      : "Prepared by Anonymous Potato";
-    ctx.fillText(preparedText, CANVAS_WIDTH / 2, footerDividerY + 30);
-
     // 13. Branding Footer (below card)
     ctx.fillStyle = "#D4D4D8";
     ctx.font = "400 26px sans-serif";

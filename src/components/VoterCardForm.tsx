@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useRef } from "react";
-import { Plus, X, RefreshCw, Loader2 } from "lucide-react";
+import { Plus, X, Loader2 } from "lucide-react";
 import { VoterCardData, VotingRow } from "@/lib/types";
 import {
-  POTATO_IMAGES,
   MAX_NAME_CHARS,
   MAX_TITLE_CHARS,
   MAX_ROW_TEXT_CHARS,
@@ -54,11 +53,6 @@ export default function VoterCardForm({
         r.id === id ? { ...r, [field]: value } : r
       ),
     });
-  };
-
-  const randomizePotato = () => {
-    const newIndex = Math.floor(Math.random() * POTATO_IMAGES.length) + 1;
-    setData({ ...data, potatoIndex: newIndex });
   };
 
   const handleMaxLength = (inputRef: React.RefObject<HTMLInputElement>, maxLen: number) => {
@@ -310,20 +304,6 @@ export default function VoterCardForm({
           ) : (
             "Generate Card"
           )}
-        </button>
-      </div>
-
-      {/* Swap Potato Button */}
-      <div className="flex justify-center pb-4 sm:pb-0">
-        <button
-          onClick={randomizePotato}
-          disabled={isLoading}
-          className="bg-zinc-100 hover:bg-zinc-200 text-zinc-600 text-xs font-medium px-3 py-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Change random potato image"
-          title="Swap Potato"
-        >
-          <RefreshCw className="h-3.5 w-3.5 inline mr-1" />
-          Swap Potato
         </button>
       </div>
     </section>
