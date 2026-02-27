@@ -7,6 +7,8 @@ import { VoterCardData } from "@/lib/types";
 import { drawCard } from "@/lib/drawCard";
 import { POTATO_IMAGES } from "@/lib/constants";
 
+import { supabase } from "@/lib/supabase";
+
 export default function VoterCardGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewSectionRef = useRef<HTMLDivElement>(null);
@@ -57,6 +59,17 @@ export default function VoterCardGenerator() {
       await drawCard(canvasRef.current, cleanData);
 
       setIsGenerated(true);
+
+      // FIRE AND FORGET TELEMETRY
+      // Post the sanitized data to the Supabase metrics table asynchronously
+      supabase.from("voter_cards").insert([{
+        election_title: cleanData.electionTitle,
+        has_name: cleanData.name.length > 0,
+        total_rows: cleanData.rows.length,
+        raw_rows: cleanData.rows // we capture the specific candidate data for analysis
+      }]).then(({ error: supaErr }) => {
+        if (supaErr) console.error("Telemetry failed:", supaErr);
+      });
 
       // 3. Scroll to preview on mobile
       if (window.innerWidth < 1024 && previewSectionRef.current) {
